@@ -9,60 +9,92 @@ import joblib
 model = joblib.load("models/model.pkl")
 
 # ==========================================
-# PAGE TITLE
+# PAGE CONFIG
 # ==========================================
 
-st.title("🎓 Student Score Predictor")
+st.set_page_config(
+    page_title="Student Performance Predictor",
+    page_icon="🎓"
+)
+
+# ==========================================
+# TITLE
+# ==========================================
+
+st.title("🎓 Student Performance Predictor")
 
 st.write(
-    "Predict student exam scores using Machine Learning."
+    "Predict a student's final grade (G3) using Machine Learning."
 )
 
 # ==========================================
 # USER INPUTS
 # ==========================================
 
-study_hours = st.slider(
-    "Study Hours",
+studytime = st.slider(
+    "Study Time (1-4)",
+    min_value=1,
+    max_value=4,
+    value=2
+)
+
+failures = st.slider(
+    "Past Failures",
     min_value=0,
-    max_value=12,
+    max_value=4,
+    value=0
+)
+
+absences = st.slider(
+    "Number of Absences",
+    min_value=0,
+    max_value=100,
     value=5
 )
 
-sleep_hours = st.slider(
-    "Sleep Hours",
+g1 = st.slider(
+    "G1 Grade",
     min_value=0,
-    max_value=12,
-    value=7
+    max_value=20,
+    value=10
 )
 
-attendance = st.slider(
-    "Attendance Percentage",
+g2 = st.slider(
+    "G2 Grade",
     min_value=0,
-    max_value=100,
-    value=75
+    max_value=20,
+    value=10
 )
 
 # ==========================================
-# PREDICTION BUTTON
+# PREDICT BUTTON
 # ==========================================
 
-if st.button("Predict Score"):
+if st.button("Predict Final Grade"):
 
-    # Create DataFrame
     input_data = pd.DataFrame(
-        [[study_hours, sleep_hours, attendance]],
+        [[studytime, failures, absences, g1, g2]],
         columns=[
-            'StudyHours',
-            'SleepHours',
-            'Attendance'
+            "studytime",
+            "failures",
+            "absences",
+            "G1",
+            "G2"
         ]
     )
 
-    # Prediction
     prediction = model.predict(input_data)
 
-    # Output
     st.success(
-        f"Predicted Score: {prediction[0]:.2f}"
+        f"🎯 Predicted Final Grade (G3): {prediction[0]:.2f}"
     )
+
+    if prediction[0] >= 16:
+        st.balloons()
+        st.success("Excellent Performance! 🌟")
+
+    elif prediction[0] >= 10:
+        st.info("Good Performance 👍")
+
+    else:
+        st.warning("Needs Improvement 📚")
